@@ -17,11 +17,10 @@
         # Single source of truth for the plugin list + combined vendor hash. Regenerate via `nix run .#update-version` from this directory.
         pin = import ./pin.nix;
         pkgs = import nixpkgs { inherit system; };
-        # xcaddy resolves transitive go module deps fresh each time it runs, and the resulting go.mod can bake in a `go X.Y.Z` directive newer than the default `go` in our pinned nixpkgs. Pinning buildGoModule to a known-recent go toolchain keeps the build stable across nixpkgs movement. lib.fix + `caddy = self` is required because `passthru.withPlugins` was constructed with the unoverridden caddy via auto-callPackage; rewiring the self-reference makes the override propagate.
-        caddyBase = pkgs.lib.fix (self: pkgs.caddy.override {
+        # xcaddy resolves transitive go module deps fresh each time it runs, and the resulting go.mod can bake in a `go X.Y.Z` directive newer than the default `go` in our pinned nixpkgs. Pinning buildGoModule to a known-recent go toolchain keeps the build stable across nixpkgs movement. nixpkgs builds withPlugins against finalAttrs.finalPackage, so the override propagates to the plugin build on its own.
+        caddyBase = pkgs.caddy.override {
           buildGoModule = pkgs.buildGo126Module;
-          caddy = self;
-        });
+        };
         caddy = caddyBase.withPlugins {
           inherit (pin) plugins hash;
         };
