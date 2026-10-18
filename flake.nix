@@ -9,14 +9,31 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, flake-lib }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      flake-lib,
+      treefmt-nix,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         # Single source of truth for the plugin list + combined vendor hash. Regenerate via `nix run .#update-version` from this directory.
         pin = import ./pin.nix;
         pkgs = import nixpkgs { inherit system; };
+        treefmtEval = treefmt-nix.lib.evalModule pkgs {
+          projectRootFile = "flake.nix";
+          programs.nixfmt.enable = true;
+          programs.shfmt.enable = true;
+        };
         # xcaddy resolves transitive go module deps fresh each time it runs, and the resulting go.mod can bake in a `go X.Y.Z` directive newer than the default `go` in our pinned nixpkgs. Pinning buildGoModule to a known-recent go toolchain keeps the build stable across nixpkgs movement. nixpkgs builds withPlugins against finalAttrs.finalPackage, so the override propagates to the plugin build on its own.
         caddyBase = pkgs.caddy.override {
           buildGoModule = pkgs.buildGo126Module;
@@ -41,5 +58,8 @@
           inherit caddy update-version revalidate-hash;
           default = caddy;
         };
-      });
+        formatter = treefmtEval.config.build.wrapper;
+        checks.formatting = treefmtEval.config.build.check self;
+      }
+    );
 }
