@@ -34,11 +34,7 @@
           programs.nixfmt.enable = true;
           programs.shfmt.enable = true;
         };
-        # xcaddy resolves transitive go module deps fresh each time it runs, and the resulting go.mod can bake in a `go X.Y.Z` directive newer than the default `go` in our pinned nixpkgs. Pinning buildGoModule to a known-recent go toolchain keeps the build stable across nixpkgs movement. nixpkgs builds withPlugins against finalAttrs.finalPackage, so the override propagates to the plugin build on its own.
-        caddyBase = pkgs.caddy.override {
-          buildGoModule = pkgs.buildGo126Module;
-        };
-        caddy = caddyBase.withPlugins {
+        caddy = pkgs.caddy.withPlugins {
           inherit (pin) plugins hash;
         };
         update-version = pkgs.writeShellApplication {
