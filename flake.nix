@@ -45,7 +45,6 @@
         # plugin resolution stays in update-version.sh (a manifest-style source).
         revalidate-hash = flake-lib.lib.mkRevalidateHash {
           inherit pkgs;
-          buildAttr = "caddy";
           hashField = "hash";
         };
       in
