@@ -3,11 +3,9 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
     flake-lib = {
       url = "github:jgus-org/flake-lib/v1";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -19,11 +17,10 @@
     {
       self,
       nixpkgs,
-      flake-utils,
       flake-lib,
       treefmt-nix,
     }:
-    flake-utils.lib.eachDefaultSystem (
+    flake-lib.lib.eachDefaultSystem (
       system:
       let
         # Single source of truth for the plugin list + combined vendor hash. Regenerate via `nix run .#update-version` from this directory.
