@@ -2,23 +2,15 @@
   description = "Caddy with selected plugins (cloudflare DNS, rate-limit, cache-handler).";
 
   inputs = {
+    flake-lib.url = "github:jgus-org/flake-lib/v1";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-lib = {
-      url = "github:jgus-org/flake-lib/v1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    treefmt-nix = {
-      url = "github:numtide/treefmt-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
     {
       self,
-      nixpkgs,
       flake-lib,
-      treefmt-nix,
+      nixpkgs,
     }:
     flake-lib.lib.eachDefaultSystem (
       system:
@@ -26,13 +18,11 @@
         # Single source of truth for the plugin list + combined vendor hash. Regenerate via `nix run .#update-version` from this directory.
         pin = import ./pin.nix;
         pkgs = import nixpkgs { inherit system; };
-        treefmtEval = treefmt-nix.lib.evalModule pkgs {
-          projectRootFile = "flake.nix";
-          programs.nixfmt.enable = true;
-          programs.shfmt.enable = true;
+        orgFormatting = flake-lib.lib.mkFormatting {
+          inherit self system;
         };
         caddy = pkgs.caddy.withPlugins {
-          inherit (pin) plugins hash;
+          inherit (pin) hash plugins;
         };
         update-version = pkgs.writeShellApplication {
           name = "update-version";
@@ -46,12 +36,12 @@
         };
       in
       {
+        checks.formatting = orgFormatting.check;
+        formatter = orgFormatting.formatter;
         packages = {
-          inherit caddy update-version revalidate-hash;
+          inherit caddy revalidate-hash update-version;
           default = caddy;
         };
-        formatter = treefmtEval.config.build.wrapper;
-        checks.formatting = treefmtEval.config.build.check self;
       }
     );
 }
