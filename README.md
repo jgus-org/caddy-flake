@@ -25,6 +25,4 @@ then take `inputs.caddy.packages.${system}.caddy`, which is what a service or im
 
 The module set is fixed. If you need a different set of plugins, `pkgs.caddy.withPlugins` against your own nixpkgs is the direct route; this flake only publishes the one combination it pins.
 
-## License
-
-The package's `meta.license` is Apache-2.0, inherited from nixpkgs' Caddy; each compiled plugin module carries its own license.
+See [LICENSE.md](LICENSE.md) for licensing and copyright, and [NOTICE.md](NOTICE.md) for the terms of upstream and distributed artifacts.
