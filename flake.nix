@@ -2,7 +2,10 @@
   description = "Caddy with selected plugins (cloudflare DNS, rate-limit, cache-handler).";
 
   inputs = {
-    flake-lib.url = "github:jgus-org/flake-lib/v1";
+    flake-lib = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:jgus-org/flake-lib/v1";
+    };
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
 
