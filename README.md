@@ -1,6 +1,6 @@
 # caddy-flake
 
-A Nix flake that provides [Caddy](https://github.com/caddyserver/caddy) built with three extra modules compiled in: [cloudflare DNS](https://github.com/caddy-dns/cloudflare), [rate-limit](https://github.com/mholt/caddy-ratelimit), and [cache-handler](https://github.com/caddyserver/cache-handler). The plugin revisions are pinned by this flake and only move when its updater runs; the Caddy release itself tracks this flake's nixpkgs input, so it is whatever nixpkgs-unstable currently ships.
+A Nix flake that provides [Caddy](https://github.com/caddyserver/caddy) built with three extra modules compiled in: [cloudflare DNS](https://github.com/caddy-dns/cloudflare), [rate-limit](https://github.com/mholt/caddy-ratelimit), and [cache-handler](https://github.com/caddyserver/cache-handler). The plugin revisions are pinned by this flake and only move when its updater runs; the Caddy release itself tracks this flake's nixpkgs input, so it is whatever nixos-unstable currently ships.
 
 ## Outputs
 
